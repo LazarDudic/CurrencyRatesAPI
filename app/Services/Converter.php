@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Currency;
+use App\Validation\Validate;
 
 class Converter
 {
@@ -10,6 +11,10 @@ class Converter
 
     public function __construct($currencies, $name = 'EUR')
     {
+        if (! Validate::currency($name)) {
+            throw new \Exception('Currency not found.');
+        }
+
         $this->rates['base'] = $name;
 
         if ($name !== 'EUR') {
