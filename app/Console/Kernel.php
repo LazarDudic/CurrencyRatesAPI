@@ -24,7 +24,12 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        // $schedule->command('inspire')->hourly();
+        $schedule->command('scrape:upload')
+            ->between('7:00', '7:40')
+            ->everyMinute()
+            ->when(function() {
+                return Currency::whereDate('created_at', Carbon::today())->count() < 32;
+            });
     }
 
     /**
