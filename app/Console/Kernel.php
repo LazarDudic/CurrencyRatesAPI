@@ -2,6 +2,8 @@
 
 namespace App\Console;
 
+use App\Models\Currency;
+use Carbon\Carbon;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
@@ -19,11 +21,16 @@ class Kernel extends ConsoleKernel
     /**
      * Define the application's command schedule.
      *
-     * @param  \Illuminate\Console\Scheduling\Schedule  $schedule
+     * @param \Illuminate\Console\Scheduling\Schedule $schedule
      * @return void
+     * @throws \Exception
      */
     protected function schedule(Schedule $schedule)
     {
+
+        $schedule->command('history:currency-rates')
+            ->dailyAt('8:00');
+
         $schedule->command('scrape:upload')
             ->between('7:00', '7:40')
             ->everyMinute()
