@@ -29,12 +29,20 @@ class Rates
 
     public function date($date)
     {
+        if (! Validate::date($date)) {
+            abort(404);
+        }
+
         $this->date = Carbon::parse($date);
         return $this;
     }
 
     public function between($from, $to)
     {
+        if (! Validate::date($from) || ! Validate::date($to)) {
+            abort(404);
+        }
+
         $this->between['from'] = Carbon::parse($from);
         $this->between['to'] = Carbon::parse($to);
         return $this;

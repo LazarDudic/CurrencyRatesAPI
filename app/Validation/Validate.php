@@ -13,4 +13,14 @@ class Validate
 
         return in_array($currency, $currencies);
     }
+
+    public static function date($date)
+    {
+        if(! preg_match('/^[0-9]{4}-[0-9]{1,2}-[0-9]{1,2}$/', $date)) {
+            return false;
+        };
+        $date = explode('-', $date);
+
+        return checkdate($date[1], $date[2], $date[0]);
+    }
 }
