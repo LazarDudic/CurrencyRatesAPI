@@ -18,4 +18,8 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::apiResource('/latest', \App\Http\Controllers\LatestController::class);
+Route::apiResource('/latest', \App\Http\Controllers\LatestController::class)
+    ->only('index');
+
+Route::get('/history/', [\App\Http\Controllers\HistoryController::class, 'index']);
+Route::get('/history/{date}', [\App\Http\Controllers\HistoryController::class, 'show']);
