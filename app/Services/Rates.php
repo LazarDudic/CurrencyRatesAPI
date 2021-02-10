@@ -2,26 +2,61 @@
 
 namespace App\Services;
 
-use App\Models\Currency;
 use App\Models\History;
 use App\Validation\Validate;
 use Carbon\Carbon;
 
 class Rates
 {
-    public function get($currency = 'EUR')
+    private $currency = 'EUR';
+    private $date;
+    private $rates;
+    private $between = [];
+
+    public function __construct()
+    {
+        $this->date = Carbon::today();
+    }
+    public function currency($currency)
     {
         if (! Validate::currency($currency)) {
             abort(404);
         }
 
-        $history = History::latest()->first();
-        $currencies  = json_decode($history->rates);
-        $convert = new Converter($currencies);
-        $rates = $convert->getRates();
-        $rates['date'] = $history->created_at;
-
-        return $rates;
+        $this->currency = $currency;
+        return $this;
     }
+
+    public function date($date)
+    {
+        $this->date = Carbon::parse($date);
+        return $this;
+    }
+
+    public function between($from, $to)
+    {
+        $this->between['from'] = Carbon::parse($from);
+        $this->between['to'] = Carbon::parse($to);
+        return $this;
+    }
+
+    public function get()
+    {
+        if (count($this->between) === 2) {
+            $history = History::whereBetween('created_at', [
+                $this->between['from'],
+                $this->between['to']
+            ])->get();
+
+        } else {
+            $history = History::whereDate('created_at', $this->date)->latest()->firstOrFail();
+        }
+
+        $convert = new Converter($history, $this->currency);
+        $this->rates = $convert->getRates();
+
+        return $this->rates;
+    }
+
 
 }
