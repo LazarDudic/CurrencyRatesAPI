@@ -18,7 +18,8 @@ class HistoryController extends Controller
 
         $validate = Validate::currency($base, 'base')
             ->date($request->start_at, 'start_at')
-            ->date($request->end_at, 'end_at');
+            ->date($request->end_at, 'end_at')
+            ->symbols($request->symbols);
 
         if ($validate->getErrors()) {
             return response($validate->getErrors(), 400);
@@ -26,6 +27,7 @@ class HistoryController extends Controller
 
         $rates = Rates::currency($base)
             ->between($request->start_at, $request->end_at)
+            ->symbols($request->symbols)
             ->get();
 
         if (is_null($rates)) {

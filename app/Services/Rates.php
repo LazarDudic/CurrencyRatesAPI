@@ -8,6 +8,10 @@ use Carbon\Carbon;
 class Rates
 {
     private $currency = 'EUR';
+    private $symbols = ['EUR', 'CAD', 'HKD', 'ISK', 'PHP', 'DKK', 'HUF', 'CZK', 'AUD', 'RON'
+        , 'SEK', 'IDR', 'INR', 'BRL', 'RUB', 'HRK', 'JPY', 'THB', 'CHF', 'SGD', 'PLN'
+        , 'BGN', 'TRY', 'CNY', 'NOK', 'NZD', 'ZAR', 'USD', 'MXN', 'ILS', 'GBP', 'KRW', 'MYR'
+    ];
     private $date;
     private $rates;
     private $between = [];
@@ -25,7 +29,7 @@ class Rates
             return null;
         }
 
-        $convert = new Converter($history, $this->currency);
+        $convert = new Converter($history, $this->currency, $this->symbols);
         $this->rates = $convert->getRates();
 
         return $this->rates;
@@ -40,6 +44,21 @@ class Rates
     public function date($date)
     {
         $this->date = Carbon::parse($date);
+        return $this;
+    }
+
+    public function symbols($symbols)
+    {
+        if (is_null($symbols)) {
+            return $this;
+        }
+
+        $symbols = explode(',', $symbols);
+        if (in_array($this->currency, $symbols)) {
+            unset($symbols[$this->currency]);
+        }
+
+        $this->symbols = $symbols;
         return $this;
     }
 

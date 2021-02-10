@@ -8,9 +8,11 @@ use Illuminate\Database\Eloquent\Collection;
 class Converter
 {
     protected $rates = [];
+    protected $symbols;
 
-    public function __construct($currencies, $name = 'EUR')
+    public function __construct($currencies, $name, $symbols)
     {
+        $this->symbols = $symbols;
 
         if ($currencies instanceof Collection) {
             $this->convertBetweenDaysRates($name, $currencies);
@@ -29,17 +31,23 @@ class Converter
         // EUR is default.
         if ($name === 'EUR') {
             foreach ($rates as $name => $rate) {
-                $this->rates['rates'][$name] =  $rate;
+                if (in_array($name, $this->symbols)) {
+                    $this->rates['rates'][$name] =  $rate;
+                }
             }
             return;
         }
 
         // All other currencies we get converting from EUR = 1
         $requestedCurrency = Currency::where('name', $name)->latest()->first();
-        $this->rates['rates']['EUR'] = number_format(1 / $requestedCurrency->rate, 4);
+        if (in_array('EUR', $this->symbols)) {
+            $this->rates['rates']['EUR'] = number_format(1 / $requestedCurrency->rate, 4);
+        }
 
         foreach ($rates as $name => $rate) {
-            $this->rates['rates'][$name] = number_format(1 / $requestedCurrency->rate * $rate, 4);
+            if (in_array($name, $this->symbols)) {
+                $this->rates['rates'][$name] = number_format(1 / $requestedCurrency->rate * $rate, 4);
+            }
         }
     }
 
@@ -51,7 +59,9 @@ class Converter
                 $this->rates[$date->created_at]['base'] = $name;
                 $rates = json_decode($date->rates);
                 foreach ($rates as $currency => $rate) {
-                    $this->rates[$date->created_at]['rates'][$currency] =  $rate;
+                    if (in_array($currency, $this->symbols)) {
+                        $this->rates[$date->created_at]['rates'][$currency] = $rate;
+                    }
                 }
             }
             return;
@@ -63,10 +73,15 @@ class Converter
             $requestedCurrencyRate = $rates->$name;
 
             $this->rates[$date->created_at]['base'] = $name;
-            $this->rates[$date->created_at]['rates']['EUR'] = number_format(1 / $requestedCurrencyRate, 4);
+
+            if (in_array('EUR', $this->symbols)) {
+                $this->rates[$date->created_at]['rates']['EUR'] = number_format(1 / $requestedCurrencyRate, 4);
+            }
 
             foreach ($rates as $currency => $rate) {
-                $this->rates[$date->created_at]['rates'][$currency] = number_format(1 / $requestedCurrencyRate * $rate, 4);
+                if (in_array($currency, $this->symbols)) {
+                    $this->rates[$date->created_at]['rates'][$currency] = number_format(1 / $requestedCurrencyRate * $rate, 4);
+                }
             }
         }
 
