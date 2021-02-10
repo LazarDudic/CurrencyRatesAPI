@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use App\Models\History;
-use App\Validation\Validate;
 use Carbon\Carbon;
 
 class Rates
@@ -17,38 +16,41 @@ class Rates
     {
         $this->date = Carbon::today();
     }
-    public function currency($currency)
+
+    public function get()
     {
-        if (! Validate::currency($currency)) {
-            abort(404);
+        $history = $this->getHistory();
+
+        if (is_null($history) || $history->count() === 0) {
+            return null;
         }
 
+        $convert = new Converter($history, $this->currency);
+        $this->rates = $convert->getRates();
+
+        return $this->rates;
+    }
+
+    public function currency($currency)
+    {
         $this->currency = $currency;
         return $this;
     }
 
     public function date($date)
     {
-        if (! Validate::date($date)) {
-            abort(404);
-        }
-
         $this->date = Carbon::parse($date);
         return $this;
     }
 
     public function between($from, $to)
     {
-        if (! Validate::date($from) || ! Validate::date($to)) {
-            abort(404);
-        }
-
         $this->between['from'] = Carbon::parse($from);
         $this->between['to'] = Carbon::parse($to);
         return $this;
     }
 
-    public function get()
+    private function getHistory()
     {
         if (count($this->between) === 2) {
             $history = History::whereBetween('created_at', [
@@ -57,13 +59,10 @@ class Rates
             ])->get();
 
         } else {
-            $history = History::whereDate('created_at', $this->date)->latest()->firstOrFail();
+            $history = History::whereDate('created_at', $this->date)->latest()->first();
         }
 
-        $convert = new Converter($history, $this->currency);
-        $this->rates = $convert->getRates();
-
-        return $this->rates;
+        return $history;
     }
 
 

@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use App\Models\Currency;
-use App\Validation\Validate;
 use Illuminate\Database\Eloquent\Collection;
 
 class Converter
@@ -12,9 +11,6 @@ class Converter
 
     public function __construct($currencies, $name = 'EUR')
     {
-        if (! Validate::currency($name)) {
-            throw new \Exception('Currency not found.');
-        }
 
         if ($currencies instanceof Collection) {
             $this->convertBetweenDaysRates($name, $currencies);
