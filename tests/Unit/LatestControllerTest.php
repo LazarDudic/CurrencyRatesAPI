@@ -2,12 +2,23 @@
 
 namespace Tests\Unit;
 
+use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
 class LatestControllerTest extends TestCase
 {
+    use RefreshDatabase;
+
+    public function setUp(): void{
+        parent::setUp();
+        $this->artisan('db:seed');
+        Sanctum::actingAs(User::factory()->create(), ['*']);
+    }
+
     /** @test */
-    public function action_index_passes()
+    public function latest_controller_index_passes()
     {
         $response = $this->get('api/latest');
 
@@ -15,7 +26,7 @@ class LatestControllerTest extends TestCase
     }
 
     /** @test */
-    public function action_index_fails_with_fake_base()
+    public function latest_controller_index_fails_with_fake_base()
     {
         $response = $this->get('api/latest?base=ABC');
 
@@ -23,7 +34,7 @@ class LatestControllerTest extends TestCase
     }
 
     /** @test */
-    public function action_index_fails_with_fake_symbols()
+    public function latest_controller_index_fails_with_fake_symbols()
     {
         $response = $this->get('/api/latest?symbols=ABC,USD');
 
@@ -31,7 +42,7 @@ class LatestControllerTest extends TestCase
     }
 
     /** @test */
-    public function action_index_fails_with_passes_with_valid_base()
+    public function latest_controller_index_fails_with_passes_with_valid_base()
     {
         $response = $this->get('/api/latest?base=USD');
 
@@ -39,7 +50,7 @@ class LatestControllerTest extends TestCase
     }
 
     /** @test */
-    public function action_index_fails_with_passes_with_valid_symbols()
+    public function latest_controller_index_fails_with_passes_with_valid_symbols()
     {
         $response = $this->get('/api/latest?symbols=USD,CAD');
 
