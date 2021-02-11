@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\History;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class HistoryFactory extends Factory
@@ -28,8 +29,10 @@ class HistoryFactory extends Factory
         foreach ($currencies as $currency) {
             $data[$currency] = $this->faker->randomFloat(0.4, 0.1, 200);
         }
+
         return [
-            'rates' => json_encode($data)
+            'rates' => json_encode($data),
+            'created_at' => Carbon::today()
         ];
     }
 }

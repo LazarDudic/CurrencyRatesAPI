@@ -10,7 +10,7 @@ class History extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['rates'];
+    protected $fillable = ['rates', 'created_at'];
 
     public function getCreatedAtAttribute($date)
     {

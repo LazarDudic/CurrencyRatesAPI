@@ -65,7 +65,7 @@ class Rates
     public function between($from, $to)
     {
         $this->between['from'] = Carbon::parse($from);
-        $this->between['to'] = Carbon::parse($to);
+        $this->between['to'] = Carbon::parse($to)->addDay();
         return $this;
     }
 
