@@ -16,7 +16,8 @@ class DatabaseSeeder extends Seeder
         // \App\Models\User::factory(10)->create();
 //        \App\Models\Currency::factory(1)->create();
         $this->call(CurrencySeeder::class);
-        \App\Models\History::factory(1)->create();
+        $this->call(HistorySeeder::class);
+//        \App\Models\History::factory(1)->create();
 
     }
 }
