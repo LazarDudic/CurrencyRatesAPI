@@ -28,7 +28,11 @@ class AuthController extends Controller
         'password' => Hash::make($request->password),
         ]);
 
-        return response($user, 201);
+        $response = [
+            'message' => 'You have been successfully registered. Login to your account in order to get your api token.'
+        ];
+
+        return response($response, 201);
     }
 
     public function login(Request $request)
@@ -55,8 +59,9 @@ class AuthController extends Controller
         }
 
         $user = User::where('email', $request->email)->first();
-        $authToken = $user->createToken('access:token')->plainTextToken;
+        $user->tokens()->delete();
 
+        $authToken = $user->createToken('access:token')->plainTextToken;
         return response(['access_token' => $authToken,], 200);
     }
 
