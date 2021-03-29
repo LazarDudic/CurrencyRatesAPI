@@ -41,12 +41,10 @@ class ScrapeAndUploadCurrencyRates extends Command
     public function handle()
     {
         $scraper = new Scraper();
-        $currencyName = $scraper->getCurrencyName();
-        $rate = $scraper->getCurrencyRate();
+        $currencies = $scraper->getCurrency();
 
-        Currency::create([
-            'name' => $currencyName,
-            'rate' => $rate,
-        ]);
+        foreach ($currencies as $currency) {
+            Currency::create($currency);
+        }
     }
 }

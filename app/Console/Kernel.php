@@ -27,16 +27,11 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
+        $schedule->command('scrape:upload')
+            ->dailyAt('07:55');
 
         $schedule->command('history:currency-rates')
-            ->dailyAt('8:00');
-
-        $schedule->command('scrape:upload')
-            ->between('7:00', '7:40')
-            ->everyMinute()
-            ->when(function() {
-                return Currency::whereDate('created_at', Carbon::today())->count() < 32;
-            });
+            ->dailyAt('08:00');
     }
 
     /**
